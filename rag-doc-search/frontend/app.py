@@ -53,7 +53,10 @@ def main():
         password = st.text_input("パスワードを入力してください",type='password')
         if st.button("ログイン"):
 
-            url = 'http://localhost:8000/api/v1/login/access-token'
+            url = 'http://rag-doc-search-backend-1:8000/api/v1/login/access-token'
+            #url = 'http://localhost:8000/api/v1/login/access-token'
+            #url = 'http://localhost:8000/api/v1/login/access-token'
+
 
             form_data = {
                 "grant_type":"password",

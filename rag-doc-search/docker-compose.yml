@@ -22,8 +22,6 @@ services:
   adminer:
     image: adminer
     restart: always
-    networks: 
-      - default
     depends_on:
       - db
     environment:
@@ -35,8 +33,6 @@ services:
   backend:
     image: '${DOCKER_IMAGE_BACKEND?Variable not set}:${TAG-latest}'
     restart: always
-    networks: 
-      - default
     build: 
         context: ./backend
         dockerfile: Dockerfile
@@ -66,16 +62,13 @@ services:
       - SENTRY_DSN=${SENTRY_DSN}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/utils/health-check/"]
-      interval: 60s
+      interval: 5s
       timeout: 5s
       retries: 5
-
 
   frontend:
     image: '${DOCKER_IMAGE_FRONTEND?Variable not set}:${TAG-latest}'
     restart: always
-    networks: 
-      - default
     build: 
       context: ./frontend
       dockerfile: Dockerfile
@@ -85,13 +78,12 @@ services:
       db:
         condition: service_healthy
         restart: true
+      backend:
+        condition: service_healthy
+        restart: true     
     ports:
       - 8501:8501
 
 volumes:
   app-db-data:
 
-networks:
-  default:
-    name: rag-doc-search_default
-    external: true
