@@ -1,0 +1,8 @@
+# 実行
+streamlit run app.py –server.port=8501
+
+# docker build
+docker build -t haru-frontend:latest .
+
+# docker run
+docker run haru-frontend

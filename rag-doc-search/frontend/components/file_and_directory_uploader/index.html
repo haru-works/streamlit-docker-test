@@ -1,0 +1,28 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="style.css">
+  </head>
+
+  <!--
+  ----------------------------------------------------
+  Your custom static HTML goes in the body:
+  -->
+
+  <body>
+      <div id="upFileWrap">
+        <br />ユーザー名：<span id="username_label">Awaiting value from Streamlit</span>
+        <br />コレクション名：<span id="collectionname_label">Awaiting value from Streamlit</span>
+        <div id="inputFile">
+            <!-- ドラッグ&ドロップエリア -->
+            <p id="dropArea">ここにファイルかフォルダをドロップしてください.<br>または</p>
+            <!-- 通常のinput[type=file] -->
+            <div id="inputFileWrap">
+                <input type="file" name="uploadFile" id="uploadFile" multiple>
+                <div id="btnInputFile"><span>ファイルを選択する</span></div>
+            </div>
+        </div>
+        <br /><span id="message_label">Awaiting value from Streamlit</span>
+    </div>
+  </body>
+  <script src="script.js"></script>
+</html>
