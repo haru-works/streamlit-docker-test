@@ -1,5 +1,5 @@
 # pythonのTags名を指定。
-FROM python:3.10
+FROM python:3.11
 # 処理を実行するフォルダ名を指定。
 WORKDIR /backend
 # 実行環境にインストールする内容を記載したtxtファイルを実行フォルダにコピーする

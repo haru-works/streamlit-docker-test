@@ -1,5 +1,5 @@
 # pythonのTags名を指定。
-FROM python:3.10
+FROM python:3.11
 # 処理を実行するフォルダ名を指定。
 WORKDIR /frontend
 # 実行環境にインストールする内容を記載したtxtファイルを実行フォルダにコピーする
@@ -13,5 +13,4 @@ EXPOSE 8501
 
 COPY . .
 
-#CMD ["streamlit", "run","app.py","-server.port=8501","-server.address=0.0.0.0"]
-CMD ["streamlit", "run","app.py"]
+CMD ["streamlit", "run","app.py","--server.port","8501"]
