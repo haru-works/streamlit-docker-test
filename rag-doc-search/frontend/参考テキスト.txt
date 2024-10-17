@@ -1,0 +1,52 @@
+async function downloadFile(blob, fileName) {
+  // ファイル拡張子を取得
+  const extension = fileName.split('.').pop();
+
+  // 拡張子からMIMEタイプを推測
+  let mimeType;
+  switch (extension) {
+    case 'docx':
+      mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+      break;
+    case 'xlsx':
+      mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+      break;
+    case 'txt':
+      mimeType = 'text/plain';
+      break;
+    case 'pdf':
+      mimeType = 'application/pdf';
+      break;
+    case 'csv':
+      mimeType = 'text/csv';
+      break;
+    case 'pptx':
+      mimeType = 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+      break;
+    default:
+      // 拡張子が不明な場合は、汎用的なMIMEタイプを使用
+      mimeType = 'application/octet-stream';
+  }
+
+  // Blobの作成
+  const blob = new Blob([textData], { type: mimeType }); 
+
+  // ダウンロード処理
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', fileName);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+// APIからデータを取得する例
+async function fetchData() {
+  const response = await fetch('https://example.com/api/data');
+  const textData = await response.text(); // テキストデータを取得
+  const fileName = 'downloaded_file.docx'; // ファイル名
+  downloadFile(textData, fileName);
+}
+
+fetchData();
