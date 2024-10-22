@@ -43,7 +43,7 @@
 
     _sendMessage(COMPONENT_READY, { apiVersion: 1 });
 
-    setFrameHeight(400);
+    setFrameHeight(500);
   };
 
   function setFrameHeight(height) {
@@ -71,39 +71,66 @@
         reader.readAsDataURL(file);
       });
 
-    const handleFiles = (files) => {
-        dataFiles = []
-        for  (let i = 0; i < files.length; i++) {
+  const UPLOAD_URL = "http://localhost:8000/api/v1/files/uploadfile/"
 
-            username = username_label.innerHTML
-            collectionname = collectionname_label.innerHTML
+    // wait処理
+    async function wait(second) {
+      return new Promise(resolve => setTimeout(resolve, 1000 * second));
+    }
 
-            const formData = new FormData();
-            formData.append("username", username);
-            formData.append("collectionname", collectionname);
-            formData.append('upload_file', files[i]);
-            const URL = "http://localhost:8000/api/v1/files/uploadfile/"
-            const requestOptions={
+    // ファイルアップロード処理
+    async function requestUploadfile(index,file,username,collectionname) {
+      return new Promise((resolve) => {
+              const formData = new FormData();
+              formData.append("username", username);
+              formData.append("collectionname", collectionname);
+              formData.append('upload_file', file);
+              const requestOptions={
                 method:"POST",
                 mode:"cors",
                 headers: {
                     'Access-Control-Allow-Origin':'*',
                     'Authorization': 'Bearer '+ ACCESS_TOKEN,
-                    'Accept': 'application/json',
-                    
+                    'Accept': 'application/json',  
                 },
                 body:formData
+              }
+              fetch(UPLOAD_URL, requestOptions)
+                  .then(response => {
+                    console.log(response)
+                  })
+
+              resolve(true);
+          });
+    }
+
+
+    const handleFiles = async (files) => {
+        dataFiles = []
+        for  (let i = 0; i < files.length; i++) {
+            username = username_label.innerHTML
+            collectionname = collectionname_label.innerHTML
+            //処理中
+            msgLabel.innerHTML = (i+1) + "件目" + "処理中…"
+            // 処理の完了を待つ
+            const res = await requestUploadfile(i,files[i],username,collectionname);   
+            if(res === true){
+              msgLabel.innerHTML = (i+1) + "件目" + "処理OK"
+              dataFiles.push({"filename":files[i].name});
+              console.log( (i+1) + "件目" + "処理OK")
+            }else{
+              msgLabel.innerHTML = (i+1) + "件目" + "処理NG"
             }
-            fetch(URL, requestOptions)
-                .then(response => {console.log(response)})
+            await wait(3);
 
-
-            dataFiles.push({"filename":files[i].name})
+            if((i+1) === files.length){
+              msgLabel.innerHTML = "送信完了"
+            }
         }
         notifyHost({
             value: dataFiles,
             dataType: "json",
-          });
+        });
     };
 
 
@@ -111,7 +138,6 @@
         const fileList = event.target.files;
         handleFiles(fileList);
     });
-
 
     ddZone.addEventListener('dragover', (event) => event.preventDefault());
         const onDrop = async (event) => {
