@@ -1,128 +1,70 @@
 import streamlit as st
-from datetime import datetime
-import hashlib
-import requests
-import json
-from components.file_and_directory_uploader import component_file_and_directory_uploader
 
-if 'counter' not in st.session_state:
-    st.session_state.counter = 0
+if "kengen" not in st.session_state:
+    st.session_state.kengen = "一般"
 
-if 'access_token' not in st.session_state:
-    st.session_state.access_token = ""
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
 
-if 'token_type' not in st.session_state:
-    st.session_state.token_type = ""
+def login():
+    st.header('login')
+    st.write('loginページ')
 
-if 'username' not in st.session_state:
-    st.session_state.username = ""
+    kengen = st.text_input("入力してください")
 
-def run_component(props):
-    value = component_file_and_directory_uploader(key='file_and_directory_uploader_1', **props)
-    return value
+    if st.button("Log in"):
+        st.session_state.kengen = kengen
+        st.session_state.logged_in = True
+        st.rerun()
 
+def logout():
+    st.header('logout')
+    st.write('logoutページ')
 
-def handle_event(value):
-    st.header('Streamlit')
-    st.write('Received from component: ', value)
+    if st.button("Log out"):
+        st.session_state.kengen = ""
+        st.session_state.logged_in = False
+        st.rerun()
 
+# ログイン/ログアウト
+login_page = st.Page(login, title="Log in", icon=":material/login:")
+logout_page = st.Page(logout, title="Log out", icon=":material/logout:")
 
-def make_hashes(password):
-	return hashlib.sha256(str.encode(password)).hexdigest()
+# AI画面
+ai_1 = st.Page("ui_pages/ai_1.py", title="ドキュメント検索・要約", icon="🔍", default=True)
+ai_2 = st.Page("ui_pages/ai_2.py", title="ドキュメント比較・要約", icon="📚")
 
+# ユーザー設定
+user_entry = st.Page("ui_pages/user_entry.py", title="ユーザー登録", icon="🪪")
+user_delete = st.Page("ui_pages/user_delete.py", title="ユーザー削除", icon="🗑️")
+user_update = st.Page("ui_pages/user_update.py", title="ユーザー更新", icon="🔄")
 
-def check_hashes(password,hashed_text):
-	if make_hashes(password) == hashed_text:
-		return hashed_text
-	return False
+# ドキュメント設定
+docs_entry = st.Page("ui_pages/docs_entry.py", title="ドキュメント登録", icon="📄")
+docs_delete = st.Page("ui_pages/docs_delete.py", title="ドキュメント削除", icon="🗑️")
 
+if st.session_state.logged_in:
 
-
-
-
-
-def main():
-    st.title("ログイン機能テスト")
-    menu = ["ログイン","メイン","サインアップ"]
-    choice = st.sidebar.selectbox("メニュー",menu)
-
-
-    if choice == "ログイン":
-        st.subheader("ログイン画面")
-        username = st.text_input("ユーザー名を入力してください")
-        password = st.text_input("パスワードを入力してください",type='password')
-        if st.button("ログイン"):
-
-            url = 'http://backend:8000/api/v1/login/access-token'
-            #url = 'http://localhost:8000/api/v1/login/access-token'
-            #url = 'http://localhost:8000/api/v1/login/access-token'
-
-
-            form_data = {
-                "grant_type":"password",
-                "username": username,
-                "password": password,
-                "scope":"",
-                "client_id":"string",
-                "client_secret":"string"
+    if st.session_state.kengen == "管理者":   
+        pg = st.navigation(
+            {
+                "ログイン/ログアウト": [logout_page],
+                "AI画面": [ai_1, ai_2],
+                "ドキュメント設定": [docs_entry, docs_delete],
+                "ユーザー設定": [user_entry, user_delete,user_update],
             }
-
-            response = requests.post(
-                url,
-                headers={"Accept": "application/json",
-                         "Content-Type":"application/x-www-form-urlencoded"},
-                data=form_data,
-            )
-
-            token = json.loads(response.text)
-
-            if( response.status_code == 200 and token["access_token"] !=""):
-
-                st.success("{}さんでログインしました".format(username))
-                st.session_state.access_token = token["access_token"]
-                st.session_state.token_type = token["token_type"]
-                st.session_state.username = username
-
-            else:
-                st.warning("ユーザー名かパスワードが間違っています")
-                st.session_state.access_token = ""
-                st.session_state.token_type = ""
-                st.session_state.username = ""
-
-          
-    elif choice == "メイン":
-
-        if( st.session_state.username != "" and st.session_state.access_token !=""):
-             
-            st.subheader("メイン画面")
-            st.success("{}さんでログイン中".format(st.session_state.username))
-            st.session_state.counter = st.session_state.counter + 1
-
-            collectionname = st.text_input("コレクション名を入力してください")
-
-            props = {
-                'counter': st.session_state.counter,
-                'datetime': str(datetime.now().strftime("%H:%M:%S, %d %b %Y")),
-                'username': str(st.session_state.username),
-                'collectionname': str(collectionname),
-                'access_token': str(st.session_state.access_token),
+        )
+    elif st.session_state.kengen == "一般":   
+        pg = st.navigation(
+            {
+                "ログイン/ログアウト": [logout_page],
+                "AI画面": [ai_1, ai_2],
             }
+        )
+    else:
+        pg = st.navigation([login_page])
 
-            handle_event(run_component(props))
+else:
+    pg = st.navigation([login_page])
 
-        else:
-            st.warning("ログインしてください")
-     
-
-    elif choice == "サインアップ":
-        st.subheader("新しいアカウントを作成します")
-        username = st.text_input("ユーザー名を入力してください")
-        password = st.text_input("パスワードを入力してください",type='password')
-        repassword = st.text_input("再度パスワードを入力してください",type='password')
-        if st.button("サインアップ"):
-            st.success("アカウントの作成に成功しました")
-            st.info("ログイン画面からログインしてください")
-
-
-if __name__ == '__main__':
-    main()
+pg.run()
