@@ -1,0 +1,5 @@
+http://localhost:8000/viewer.html?file=gaiyo2023_07.pdf&pageNumber=0&annotations=[{"x": 100, "y": 300, "width": 100, "height": 100, "page": 0}]
+
+
+http://localhost:8000/viewer.html?file=gaiyo2023_07.pdf&pageNumber=0&annotations=[{"x": 44.7599983215332, "y": 650.713134765625, "width": 29.35439682006836, "height": 9.720001220703125, "page": 0}]
+
